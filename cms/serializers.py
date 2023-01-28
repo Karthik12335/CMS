@@ -3,10 +3,10 @@ from  rest_framework import serializers
 from .models import Class,Course,Student,Subject,Teacher
 
 class CourseSerializer(serializers.ModelSerializer):
-    course_name = serializers.CharField(source="name")
+   
     class Meta:
         model = Course
-        fields = ["id","course_name"]
+        fields = ["id","name"]
 
 class SubjectSerializer(serializers.ModelSerializer):
     course = CourseSerializer()
@@ -15,7 +15,6 @@ class SubjectSerializer(serializers.ModelSerializer):
         fields = ["id","name","course"]
 
    
-    
 
 class StudentSerializer(serializers.ModelSerializer):
     course = CourseSerializer()
@@ -23,14 +22,29 @@ class StudentSerializer(serializers.ModelSerializer):
         model = Student
         fields = ["id","name","student_id","course"]
 
+    def create(self, validated_data):
+        course_data = validated_data.pop('course')
+        print(course_data)
+        id =course_data['name']
+        course = Course.objects.get(id=id)
+        student = Student.objects.create(course=course, **validated_data)
+        return student
+    
+
+    
+
 class TeacherSerializer(serializers.ModelSerializer):
     subjects = serializers.SerializerMethodField()
     class Meta:
         model = Teacher
-        fields = ["id","name","subjects"]
+        fields = ["id","name","employee_id","email","subjects",]
 
     def get_subjects(self, obj):
-        return [s.name for s in obj.subjects.all()]
+        key = [s.id for s in obj.subjects.all()]
+        value = [s.name for s in obj.subjects.all()]
+        dict = {k:v for (k,v) in zip(key,value)}
+        return dict
+
 
 class ClassSerializer(serializers.ModelSerializer):
     
@@ -50,8 +64,10 @@ class ClassSerializer(serializers.ModelSerializer):
         del sb_data['course']
         del t_data['subjects']
         for key in st_data:
-            del key["course"]     
+            del key["course"] 
+     
+        ft_data = {k: v for k, v in t_data.items() if k in ['id', 'name']}
         data.update({"Subject": sb_data})
-        data.update({"Teacher" : t_data})
+        data.update({"Teacher" : ft_data})
         data.update({"Students": st_data})
         return data

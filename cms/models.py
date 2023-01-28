@@ -30,8 +30,8 @@ class Student(models.Model):
 
 class Teacher(models.Model):
     name = models.CharField(max_length=50)
-    employee_id = models.CharField(max_length=50, unique=True)
-    email = models.EmailField(max_length=50)
+    employee_id = models.CharField(max_length=50, unique=True,blank=False)
+    email = models.EmailField(max_length=50,blank=False)
     subjects = models.ManyToManyField(Subject)
 
     class Meta:

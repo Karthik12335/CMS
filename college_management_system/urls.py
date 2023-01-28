@@ -15,6 +15,7 @@ router.register(r"class", views.ClassView)
 
 
 
+
 # urlpatterns = [
 #     path('admin/', admin.site.urls),
 #     path('cms/',include('cms.urls'))

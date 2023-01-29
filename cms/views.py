@@ -83,3 +83,4 @@ class ClassView(viewsets.ViewSet):
     def list(self,request):
         serializer = ClassSerializer(self.queryset, many=True)
         return Response(serializer.data)
+
